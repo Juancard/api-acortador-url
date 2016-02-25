@@ -1,21 +1,22 @@
 var https = require("https");
 var shortid = require("shortid");
-var arregloUrl = {};
-var valorAcorte = 0;
+var urlGuardadas = {};
 module.exports = function(req,res){
     var match = req.url.match(/(^\/new\/)(.+)/);
     if (match && match[1] == "/new/"){
         var urlDada = match[2];
-        var shortGenerado = shortid.generate();
-        var nuevaUrl = "https://" + req.headers.host + "/" + shortGenerado/*++valorAcorte*/;
-        arregloUrl[shortGenerado] = urlDada;
-        //arregloUrl[valorAcorte] = urlDada;
+        var shortUrl = buscarUrl(urlDada);
+        if (!shortUrl) {
+            shortUrl = shortid.generate();
+            urlGuardadas[shortUrl] = urlDada;
+        }
+        var nuevaUrl = "https://" + req.headers.host + "/" + shortUrl;
         var urlJson = JSON.stringify({"url_original": urlDada, "url_corta":nuevaUrl});
         res.writeHead(200, {"content-type": "text/json"});
         res.end(urlJson);
     } else{
         var pathAcortado = req.url.slice(1);
-        var urlPedida = arregloUrl[pathAcortado];
+        var urlPedida = urlGuardadas[pathAcortado];
         if (urlPedida){
             res.writeHead(301,{"Location":urlPedida});
             res.end();
@@ -28,13 +29,9 @@ module.exports = function(req,res){
     }
 }
 
-var callbackSolicitud = function(response){
-    var datos = '';
-    response.on('data',function(data){
-        datos += data;
-    });
-    response.on('end',function(data){
-        datos += data;
-        console.log(datos);
-    });
+function buscarUrl(urlBuscada){
+    for (var key in urlGuardadas) {
+        if (urlGuardadas[key] == urlBuscada) return key;
+    }
+    return null;
 }
