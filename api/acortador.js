@@ -31,8 +31,7 @@ module.exports = function(req,res){
 
 function buscarUrl(urlBuscada){
     for (var key in urlGuardadas) {
-        if (urlGuardadas[key] == urlBuscada) {console.log(key); return key;}
+        if (urlGuardadas[key] == urlBuscada) {return key;}
     }
-    console.log("no encontrado");
     return null;
 }
