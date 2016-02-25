@@ -1,6 +1,7 @@
-var https = require("https");
 var shortid = require("shortid");
-var urlGuardadas = {};
+
+var urlGuardadas = {"N1-icw_sx": "http://blog.codinghorror.com/"}; //Cargo una url como ejemplo
+
 module.exports = function(req,res){
     var match = req.url.match(/(^\/new\/)(.+)/);
     if (match && match[1] == "/new/"){
