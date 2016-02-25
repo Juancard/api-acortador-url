@@ -12,7 +12,9 @@ var server = http.createServer(function(req,res){
   } else {
     var match = req.url.match(/(^\/new\/)(.+)/);
     if (match[1] == "/new/"){
-      console.log("siiiiiii!!!");
+      var urlJson = JSON.stringify({"original_url": match[2]});
+      res.writeHead(200, {"content-type": "text/json"});
+      res.end(urlJson);
     }
   }
 });
