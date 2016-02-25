@@ -9,5 +9,8 @@
     "type": "git",
     "url": "https://github.com/Juancard/api-acortador-url.git"
   },
-  "dependencies": {"shortid": "~2.2.4"}
+  "dependencies": {
+    "shortid": "~2.2.4",
+    "valid-url":"~1.0.9"
+  }
 }
