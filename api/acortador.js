@@ -1,8 +1,13 @@
-module.exports = function(res,url){
-    var match = url.match(/(^\/new\/)(.+)/);
+var arregloUrl = {};
+var valorAcorte = 0;
+module.exports = function(req,res){
+    var match = req.url.match(/(^\/new\/)(.+)/);
     if (match[1] == "/new/"){
-      var urlJson = JSON.stringify({"original_url": match[2]});
-      res.writeHead(200, {"content-type": "text/json"});
-      res.end(urlJson);
+        var urlDada = match[2];
+        var nuevaUrl = "https://" + req.headers.host + "/" + ++valorAcorte;
+        arregloUrl[valorAcorte] = nuevaUrl;
+        var urlJson = JSON.stringify({"url_original": urlDada, "url_corta":nuevaUrl});
+        res.writeHead(200, {"content-type": "text/json"});
+        res.end(urlJson);
     }
 }

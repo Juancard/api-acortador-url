@@ -1,7 +1,7 @@
 var http = require('http');
 var fs = require("fs");
-var path = require("path");
-var url = require("url");
+var api = require("./api/acortador");
+
 var server = http.createServer(function(req,res){
   if (req.url == "/"){
     fs.readFile("./client/index.html",function(err,data){
@@ -10,12 +10,7 @@ var server = http.createServer(function(req,res){
       res.end(data);
     })
   } else {
-    var match = req.url.match(/(^\/new\/)(.+)/);
-    if (match[1] == "/new/"){
-      var urlJson = JSON.stringify({"original_url": match[2]});
-      res.writeHead(200, {"content-type": "text/json"});
-      res.end(urlJson);
-    }
+    api(req,res);
   }
 });
 server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
