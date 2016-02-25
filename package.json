@@ -1,0 +1,9 @@
+{
+  "name": "API-acortador-url",
+  "version": "0.0.1",
+  "description": "API que acorta la URL de la página web solicitada",
+  "main": "server.js",
+  "repository": "",
+  "author": "Juan Cardona <juan_cardona@outlook.com",
+  "dependencies": {}
+}
