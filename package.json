@@ -3,14 +3,15 @@
   "version": "0.0.1",
   "description": "API que acorta la URL de la página web solicitada",
   "main": "server.js",
-  "repository": "",
-  "author": "Juan Cardona <juan_cardona@outlook.com",
   "repository": {
     "type": "git",
     "url": "https://github.com/Juancard/api-acortador-url.git"
   },
+  "author": "Juan Cardona <juan_cardona@outlook.com",
   "dependencies": {
+    "dotenv": "^1.2.0",
+    "mongodb": "<2.6.11",
     "shortid": "~2.2.4",
-    "valid-url":"~1.0.9"
+    "valid-url": "~1.0.9"
   }
 }

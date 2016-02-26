@@ -3,19 +3,20 @@ var validUrl = require('valid-url');
 
 var urlGuardadas = {"N1-icw_sx": "http://blog.codinghorror.com/"}; //Cargo una url como ejemplo
 
-module.exports = function(req,res){
+module.exports = function(req,res,coleccion){
     var match = req.url.match(/(^\/new\/)(.+)/);
     if (match && match[1] == "/new/"){
         var urlDada = match[2];
         if (!validUrl.isUri(urlDada)){
             return errorJson(res,"Url invalida");
         }
-        console.log("entre");
         var shortUrl = buscarUrl(urlDada);
         if (!shortUrl) {
             shortUrl = shortid.generate();
             urlGuardadas[shortUrl] = urlDada;
+            guardarUrl(coleccion,shortUrl,urlDada);
         }
+            guardarUrl(coleccion,shortUrl,urlDada);
         var nuevaUrl = "https://" + req.headers.host + "/" + shortUrl;
         var urlJson = JSON.stringify({"url_original": urlDada, "url_corta":nuevaUrl});
         res.writeHead(200, {"content-type": "text/json"});
@@ -30,6 +31,18 @@ module.exports = function(req,res){
             errorJson(res,"No hay Url acortada para el input dado");
         }
     }
+}
+
+function guardarUrl(coleccion,urlCorta,urlOriginal){
+    var objetoUrl = {
+        corta:urlCorta,
+        original:urlOriginal
+    }
+    console.log("entre");
+    coleccion.insert(objetoUrl,function(err,data){
+        if (err) {throw err;}
+        console.log("Agregado: ",data);
+    })
 }
 
 function buscarUrl(urlBuscada){
