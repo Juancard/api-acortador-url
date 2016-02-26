@@ -16,7 +16,6 @@ module.exports = function(req,res,coleccion){
             urlGuardadas[shortUrl] = urlDada;
             guardarUrl(coleccion,shortUrl,urlDada);
         }
-            guardarUrl(coleccion,shortUrl,urlDada);
         var nuevaUrl = "https://" + req.headers.host + "/" + shortUrl;
         var urlJson = JSON.stringify({"url_original": urlDada, "url_corta":nuevaUrl});
         res.writeHead(200, {"content-type": "text/json"});
@@ -35,10 +34,9 @@ module.exports = function(req,res,coleccion){
 
 function guardarUrl(coleccion,urlCorta,urlOriginal){
     var objetoUrl = {
-        corta:urlCorta,
-        original:urlOriginal
+        corta: urlCorta,
+        original: urlOriginal
     }
-    console.log("entre");
     coleccion.insert(objetoUrl,function(err,data){
         if (err) {throw err;}
         console.log("Agregado: ",data);
