@@ -17,13 +17,13 @@ https://acortador23.herokuapp.com/new/http://blog.codinghorror.com/
 ## Ejemplo de salida en creación:
 
 ```json
-{"url_original": "http://blog.codinghorror.com/", "url_corta": "https://acortador23.herokuapp.com/4J7-JCcsg"}
+{"url_original": "http://blog.codinghorror.com/", "url_corta": "https://acortador23.herokuapp.com/VkI4bCcjl"}
 ```
 
 ## Usar:
 
 ```url
-https://acortador23.herokuapp.com/4J7-JCcsg
+https://acortador23.herokuapp.com/VkI4bCcjl
 ```
 
 ## Redirecciona a:
