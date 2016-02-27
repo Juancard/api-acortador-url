@@ -71,8 +71,9 @@ function errorJson(res, mensaje){
 
 function removerBarraFinal(urlDada){
     var ultimoCaracter = urlDada.substr(urlDada.length-1);
-    if (ultimoCaracter == "/"){
+    while (ultimoCaracter == "/"){
         urlDada = urlDada.substr(0,urlDada.length-1);
+        ultimoCaracter = urlDada.substr(urlDada.length-1);
     }
     console.log("luego de removido: ",urlDada);
     return urlDada;
