@@ -10,27 +10,42 @@ module.exports = function(req,res,coleccion){
         if (!validUrl.isUri(urlDada)){
             return errorJson(res,"Url invalida");
         }
-        var shortUrl = buscarUrl(urlDada);
-        var otraShortUrl = buscarUrlDb(coleccion, urlDada);//callback!
-        console.log(otraShortUrl);
+        //var shortUrl = buscarUrl(urlDada);
+        buscarUrlPorOriginal(coleccion, urlDada, function(otraShortUrl){
+            if (!otraShortUrl) {
+                otraShortUrl = shortid.generate();
+                //urlGuardadas[shortUrl] = urlDada;
+                guardarUrl(coleccion,otraShortUrl,urlDada);
+            }
+            var nuevaUrl = "https://" + req.headers.host + "/" + otraShortUrl;
+            var urlJson = JSON.stringify({"url_original": urlDada, "url_corta":nuevaUrl});
+            res.writeHead(200, {"content-type": "text/json"});
+            res.end(urlJson);
+        });//callback!
+        /*
         if (!shortUrl) {
             shortUrl = shortid.generate();
             urlGuardadas[shortUrl] = urlDada;
             guardarUrl(coleccion,shortUrl,urlDada);
         }
+        */
+        /*
         var nuevaUrl = "https://" + req.headers.host + "/" + shortUrl;
         var urlJson = JSON.stringify({"url_original": urlDada, "url_corta":nuevaUrl});
         res.writeHead(200, {"content-type": "text/json"});
         res.end(urlJson);
+        */
     } else{
         var pathAcortado = req.url.slice(1);
-        var urlPedida = urlGuardadas[pathAcortado];
-        if (urlPedida){
-            res.writeHead(301,{"Location":urlPedida});
-            res.end();
-        }else{
-            errorJson(res,"No hay Url acortada para el input dado");
-        }
+        //var urlPedida = urlGuardadas[pathAcortado];
+        buscarUrlPorCorta(coleccion,pathAcortado,function(urlPedida){
+            if (urlPedida){
+                res.writeHead(301,{"Location":urlPedida});
+                res.end();
+            }else{
+                errorJson(res,"No hay Url acortada para el input dado");
+            } 
+        });
     }
 }
 
@@ -52,13 +67,23 @@ function buscarUrl(urlBuscada){
     return null;
 }
 
-function buscarUrlDb(coleccion, urlBuscada){
+function buscarUrlPorOriginal(coleccion, urlOriginal, callback){
     coleccion.findOne({
-        "original":urlBuscada
+        "original":urlOriginal
     },function(err,data){
         if (err) throw err;
-        console.log("se encontro: ",data);
-        return data.original;
+        console.log("se encontro: ",data.corta);
+        callback(data.corta);
+    });
+}
+function buscarUrlPorCorta(coleccion, urlCorta, callback){
+    coleccion.findOne({
+        "corta":urlCorta
+    },function(err,data){
+        if (err) throw err;
+        var urlOriginal = (data)? data.original : null;
+        console.log("se encontro: ",urlOriginal);
+        callback(urlOriginal);
     });
 }
 
