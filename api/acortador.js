@@ -9,7 +9,7 @@ module.exports = function(req,res,coleccion,coleccionManager){
             return errorJson(res,"Url invalida");
         }
         urlDada = removerBarraFinal(urlDada);
-        buscarUrlPorOriginal(coleccion, urlDada, function(shortUrl){
+        buscarUrlPorOriginal(coleccion, coleccionManager, urlDada, function(shortUrl){
             if (!shortUrl) {
                 shortUrl = shortid.generate();
                 guardarUrl(coleccionManager,shortUrl,urlDada);
@@ -42,7 +42,16 @@ function guardarUrl(coleccionManager,urlCorta,urlOriginal){
         console.log("Agregado: ",data);
     });
 }
-function buscarUrlPorOriginal(coleccion, urlOriginal, callback){
+function buscarUrlPorOriginal(coleccion, coleccionManager,urlOriginal, callback){
+    var objetoBusqueda = {
+        "original":urlOriginal
+    }
+    coleccionManager.buscarUnicoDocumento(objetoBusqueda,function(err,data){
+        if (err) throw err;
+        var corta = obtenerPropiedadDocumento(data,"corta");
+        callback(corta);
+    });
+    /*
     coleccion.findOne({
         "original":urlOriginal
     },function(err,data){
@@ -51,6 +60,7 @@ function buscarUrlPorOriginal(coleccion, urlOriginal, callback){
         console.log("se encontro: ",urlCorta);
         callback(urlCorta);
     });
+    */
 }
 function buscarUrlPorCorta(coleccionManager,urlCorta, callback){
     var objetoBusqueda = {
@@ -61,14 +71,6 @@ function buscarUrlPorCorta(coleccionManager,urlCorta, callback){
         var original = obtenerPropiedadDocumento(data,"original");
         callback(original);
     });
-    /*
-    coleccionManager.buscarUnicoDocumento(objetoBusqueda,function(err,data){
-        if (err) throw err;
-        var urlOriginal = (data)? data.original : null;
-        console.log("se encontro: ",urlOriginal);
-        callback(urlOriginal);
-    });
-    */
 }
 
 function obtenerPropiedadDocumento(documento,propiedad){
@@ -77,6 +79,7 @@ function obtenerPropiedadDocumento(documento,propiedad){
         valor = documento[propiedad];
         console.log("se encontro: ",valor);
     }
+    return valor;
 }
 
 function errorJson(res, mensaje){
