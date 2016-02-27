@@ -72,8 +72,9 @@ function buscarUrlPorOriginal(coleccion, urlOriginal, callback){
         "original":urlOriginal
     },function(err,data){
         if (err) throw err;
-        console.log("se encontro: ",data.corta);
-        callback(data.corta);
+        var urlCorta = (data)? data.corta : null;
+        console.log("se encontro: ",urlCorta);
+        callback(urlCorta);
     });
 }
 function buscarUrlPorCorta(coleccion, urlCorta, callback){
