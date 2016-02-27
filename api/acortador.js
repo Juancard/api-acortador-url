@@ -9,12 +9,13 @@ module.exports = function(req,res,coleccion,coleccionManager){
             return errorJson(res,"Url invalida");
         }
         urlDada = removerBarraFinal(urlDada);
-        buscarUrlPorOriginal(coleccion, coleccionManager, urlDada, function(shortUrl){
+        buscarUrlPorOriginal(coleccionManager, urlDada, function(shortUrl){
             if (!shortUrl) {
                 shortUrl = shortid.generate();
                 guardarUrl(coleccionManager,shortUrl,urlDada);
             }
-            var nuevaUrl = "https://" + req.headers.host + "/" + shortUrl;
+            var nuevaUrl = req.headers['x-forwarded-proto'] + "://" + req.headers.host + "/" + shortUrl;
+            console.log("url generada: ",nuevaUrl);
             var urlJson = JSON.stringify({"url_original": urlDada, "url_corta":nuevaUrl});
             res.writeHead(200, {"content-type": "text/json"});
             res.end(urlJson);
@@ -42,7 +43,7 @@ function guardarUrl(coleccionManager,urlCorta,urlOriginal){
         console.log("Agregado: ",data);
     });
 }
-function buscarUrlPorOriginal(coleccion, coleccionManager,urlOriginal, callback){
+function buscarUrlPorOriginal(coleccionManager,urlOriginal, callback){
     var objetoBusqueda = {
         "original":urlOriginal
     }
@@ -51,16 +52,6 @@ function buscarUrlPorOriginal(coleccion, coleccionManager,urlOriginal, callback)
         var corta = obtenerPropiedadDocumento(data,"corta");
         callback(corta);
     });
-    /*
-    coleccion.findOne({
-        "original":urlOriginal
-    },function(err,data){
-        if (err) throw err;
-        var urlCorta = (data)? data.corta : null;
-        console.log("se encontro: ",urlCorta);
-        callback(urlCorta);
-    });
-    */
 }
 function buscarUrlPorCorta(coleccionManager,urlCorta, callback){
     var objetoBusqueda = {
@@ -77,7 +68,7 @@ function obtenerPropiedadDocumento(documento,propiedad){
     var valor = null;
     if (documento){
         valor = documento[propiedad];
-        console.log("se encontro: ",valor);
+        console.log("se encontro:",valor);
     }
     return valor;
 }
