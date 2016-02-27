@@ -26,7 +26,7 @@ mongo.connect(process.env.MONGOLAB_URI || process.env.MONGO_URI,function(err,db)
       res.end(data);
     })
   } else {
-    api(req,res,db.collection("sitios"),sitiosManager);
+    api(req,res,sitiosManager);
   }
   });
   server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){

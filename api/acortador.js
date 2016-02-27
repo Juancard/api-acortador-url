@@ -1,7 +1,7 @@
 var shortid = require("shortid");
 var validUrl = require('valid-url');
 
-module.exports = function(req,res,coleccion,coleccionManager){
+module.exports = function(req,res,coleccionManager){
     var match = req.url.match(/(^\/new\/)(.+)/);
     if (match && match[1] == "/new/"){
         var urlDada = match[2];
