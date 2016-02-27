@@ -1,7 +1,7 @@
 var shortid = require("shortid");
 var validUrl = require('valid-url');
 
-module.exports = function(req,res,coleccion){
+module.exports = function(req,res,coleccion,coleccionManager){
     var match = req.url.match(/(^\/new\/)(.+)/);
     if (match && match[1] == "/new/"){
         var urlDada = match[2];
@@ -12,7 +12,7 @@ module.exports = function(req,res,coleccion){
         buscarUrlPorOriginal(coleccion, urlDada, function(shortUrl){
             if (!shortUrl) {
                 shortUrl = shortid.generate();
-                guardarUrl(coleccion,shortUrl,urlDada);
+                guardarUrl(coleccionManager,shortUrl,urlDada);
             }
             var nuevaUrl = "https://" + req.headers.host + "/" + shortUrl;
             var urlJson = JSON.stringify({"url_original": urlDada, "url_corta":nuevaUrl});
@@ -21,7 +21,7 @@ module.exports = function(req,res,coleccion){
         });
     } else{
         var pathAcortado = req.url.slice(1);
-        buscarUrlPorCorta(coleccion,pathAcortado,function(urlPedida){
+        buscarUrlPorCorta(coleccionManager,pathAcortado,function(urlPedida){
             if (urlPedida){
                 res.writeHead(301,{"Location":urlPedida});
                 res.end();
@@ -32,15 +32,15 @@ module.exports = function(req,res,coleccion){
     }
 }
 
-function guardarUrl(coleccion,urlCorta,urlOriginal){
+function guardarUrl(coleccionManager,urlCorta,urlOriginal){
     var objetoUrl = {
         corta: urlCorta,
         original: urlOriginal
     }
-    coleccion.insert(objetoUrl,function(err,data){
+    coleccionManager.insertarDocumento(objetoUrl,function(err,data){
         if (err) {throw err;}
         console.log("Agregado: ",data);
-    })
+    });
 }
 function buscarUrlPorOriginal(coleccion, urlOriginal, callback){
     coleccion.findOne({
@@ -52,15 +52,31 @@ function buscarUrlPorOriginal(coleccion, urlOriginal, callback){
         callback(urlCorta);
     });
 }
-function buscarUrlPorCorta(coleccion, urlCorta, callback){
-    coleccion.findOne({
+function buscarUrlPorCorta(coleccionManager,urlCorta, callback){
+    var objetoBusqueda = {
         "corta":urlCorta
-    },function(err,data){
+    }
+    coleccionManager.buscarUnicoDocumento(objetoBusqueda,function(err,data){
+        if (err) throw err;
+        var original = obtenerPropiedadDocumento(data,"original");
+        callback(original);
+    });
+    /*
+    coleccionManager.buscarUnicoDocumento(objetoBusqueda,function(err,data){
         if (err) throw err;
         var urlOriginal = (data)? data.original : null;
         console.log("se encontro: ",urlOriginal);
         callback(urlOriginal);
     });
+    */
+}
+
+function obtenerPropiedadDocumento(documento,propiedad){
+    var valor = null;
+    if (documento){
+        valor = documento[propiedad];
+        console.log("se encontro: ",valor);
+    }
 }
 
 function errorJson(res, mensaje){

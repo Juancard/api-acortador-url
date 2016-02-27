@@ -2,6 +2,7 @@ var http = require('http');
 var fs = require("fs");
 var api = require("./api/acortador");
 var mongo = require('mongodb').MongoClient;
+var coleccionManager = require("./bd/coleccion-manager");
 
 require('dotenv').config();
 
@@ -14,6 +15,7 @@ mongo.connect(process.env.MONGOLAB_URI || process.env.MONGO_URI,function(err,db)
     console.log('Successfully connected to MongoDB on port 27017.');
   }
   db.createCollection("sitios", { capped : true, size : 5242880, max : 5000 } );
+  var sitiosManager = new coleccionManager(db.collection("sitios"));
 
   //creo server
   var server = http.createServer(function(req,res){
@@ -24,7 +26,7 @@ mongo.connect(process.env.MONGOLAB_URI || process.env.MONGO_URI,function(err,db)
       res.end(data);
     })
   } else {
-    api(req,res,db.collection("sitios"));
+    api(req,res,db.collection("sitios"),sitiosManager);
   }
   });
   server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
