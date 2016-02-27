@@ -13,7 +13,6 @@ mongo.connect(process.env.MONGOLAB_URI || process.env.MONGO_URI,function(err,db)
   } else {
     console.log('Successfully connected to MongoDB on port 27017.');
   }
-  db.collection("sitios").drop();
   db.createCollection("sitios", { capped : true, size : 5242880, max : 5000 } );
 
   //creo server
