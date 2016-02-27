@@ -1,8 +1,6 @@
 var shortid = require("shortid");
 var validUrl = require('valid-url');
 
-var urlGuardadas = {"N1-icw_sx": "http://blog.codinghorror.com/"}; //Cargo una url como ejemplo
-
 module.exports = function(req,res,coleccion){
     var match = req.url.match(/(^\/new\/)(.+)/);
     if (match && match[1] == "/new/"){
@@ -10,34 +8,19 @@ module.exports = function(req,res,coleccion){
         if (!validUrl.isUri(urlDada)){
             return errorJson(res,"Url invalida");
         }
-        //var shortUrl = buscarUrl(urlDada);
-        buscarUrlPorOriginal(coleccion, urlDada, function(otraShortUrl){
-            if (!otraShortUrl) {
-                otraShortUrl = shortid.generate();
-                //urlGuardadas[shortUrl] = urlDada;
-                guardarUrl(coleccion,otraShortUrl,urlDada);
+        urlDada = removerBarraFinal(urlDada);
+        buscarUrlPorOriginal(coleccion, urlDada, function(shortUrl){
+            if (!shortUrl) {
+                shortUrl = shortid.generate();
+                guardarUrl(coleccion,shortUrl,urlDada);
             }
-            var nuevaUrl = "https://" + req.headers.host + "/" + otraShortUrl;
+            var nuevaUrl = "https://" + req.headers.host + "/" + shortUrl;
             var urlJson = JSON.stringify({"url_original": urlDada, "url_corta":nuevaUrl});
             res.writeHead(200, {"content-type": "text/json"});
             res.end(urlJson);
-        });//callback!
-        /*
-        if (!shortUrl) {
-            shortUrl = shortid.generate();
-            urlGuardadas[shortUrl] = urlDada;
-            guardarUrl(coleccion,shortUrl,urlDada);
-        }
-        */
-        /*
-        var nuevaUrl = "https://" + req.headers.host + "/" + shortUrl;
-        var urlJson = JSON.stringify({"url_original": urlDada, "url_corta":nuevaUrl});
-        res.writeHead(200, {"content-type": "text/json"});
-        res.end(urlJson);
-        */
+        });
     } else{
         var pathAcortado = req.url.slice(1);
-        //var urlPedida = urlGuardadas[pathAcortado];
         buscarUrlPorCorta(coleccion,pathAcortado,function(urlPedida){
             if (urlPedida){
                 res.writeHead(301,{"Location":urlPedida});
@@ -59,14 +42,6 @@ function guardarUrl(coleccion,urlCorta,urlOriginal){
         console.log("Agregado: ",data);
     })
 }
-
-function buscarUrl(urlBuscada){
-    for (var key in urlGuardadas) {
-        if (urlGuardadas[key] == urlBuscada) {return key;}
-    }
-    return null;
-}
-
 function buscarUrlPorOriginal(coleccion, urlOriginal, callback){
     coleccion.findOne({
         "original":urlOriginal
@@ -92,4 +67,13 @@ function errorJson(res, mensaje){
     res.writeHead(404, {'Content-Type': 'text/json'});
     var err = JSON.stringify({"error":mensaje});
     res.end(err);
+}
+
+function removerBarraFinal(urlDada){
+    var ultimoCaracter = urlDada.substr(urlDada.length-1);
+    if (ultimoCaracter == "/"){
+        urlDada = urlDada.substr(0,urlDada.length-1);
+    }
+    console.log("luego de removido: ",urlDada);
+    return urlDada;
 }
