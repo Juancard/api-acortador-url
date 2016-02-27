@@ -11,6 +11,8 @@ module.exports = function(req,res,coleccion){
             return errorJson(res,"Url invalida");
         }
         var shortUrl = buscarUrl(urlDada);
+        var otraShortUrl = buscarUrlDb(coleccion, urlDada);//callback!
+        console.log(otraShortUrl);
         if (!shortUrl) {
             shortUrl = shortid.generate();
             urlGuardadas[shortUrl] = urlDada;
@@ -48,6 +50,16 @@ function buscarUrl(urlBuscada){
         if (urlGuardadas[key] == urlBuscada) {return key;}
     }
     return null;
+}
+
+function buscarUrlDb(coleccion, urlBuscada){
+    coleccion.findOne({
+        "original":urlBuscada
+    },function(err,data){
+        if (err) throw err;
+        console.log("se encontro: ",data);
+        return data.original;
+    });
 }
 
 function errorJson(res, mensaje){

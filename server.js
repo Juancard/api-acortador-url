@@ -6,7 +6,8 @@ var mongo = require('mongodb').MongoClient;
 require('dotenv').config();
 
 // En otra terminal correr: $ mongod --smallfiles
-mongo.connect(/*process.env.MONGO_URI || */process.env.MONGOLAB_URI,function(err,db){
+// Setear addon: heroku config:set MONGOLAB_URI="mongodb://user:pass@ds017678.mlab.com:17678/acortador-url"
+mongo.connect(process.env.MONGOLAB_URI || process.env.MONGO_URI,function(err,db){
     if (err) {
     throw new Error('Database failed to connect!');
   } else {
