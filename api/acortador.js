@@ -17,7 +17,7 @@ module.exports = function(req,res,coleccionManager){
             var nuevaUrl = req.headers['x-forwarded-proto'] + "://" + req.headers.host + "/" + shortUrl;
             console.log("url generada: ",nuevaUrl);
             var urlJson = JSON.stringify({"url_original": urlDada, "url_corta":nuevaUrl});
-            res.writeHead(200, {"content-type": "text/json"});
+            res.writeHead(200, {"content-type": "application/json; charset=UTF-8"});
             res.end(urlJson);
         });
     } else{
@@ -74,7 +74,7 @@ function obtenerPropiedadDocumento(documento,propiedad){
 }
 
 function errorJson(res, mensaje){
-    res.writeHead(404, {'Content-Type': 'text/json'});
+    res.writeHead(404, {'Content-Type': "application/json; charset=UTF-8"});
     var err = JSON.stringify({"error":mensaje});
     res.end(err);
 }
